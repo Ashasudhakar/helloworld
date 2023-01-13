@@ -12,7 +12,7 @@ pipeline {
     }
 
     parameters {
-        stashedFile 'large'
+        stashedFile 'Terraform_Input_File'
     }
 
     stages {
@@ -24,8 +24,8 @@ pipeline {
                     accessKeyVariable: 'AWS_ACCESS_KEY_ID',
                     secretKeyVariable: 'AWS_SECRET_ACCESS_KEY'
                 ]]) {
-                    unstash 'large'
-                    sh 'cat large > terraform.tfvars'
+                    unstash 'Terraform_Input_File'
+                    sh 'cat Terraform_Input_File > terraform.tfvars'
                     sh 'terraform init'
                     sh 'terraform plan -out myplan'
                 }
@@ -48,11 +48,9 @@ pipeline {
                     accessKeyVariable: 'AWS_ACCESS_KEY_ID',
                     secretKeyVariable: 'AWS_SECRET_ACCESS_KEY'
                 ]]) {
-                    unstash 'large'
-                    sh """
-                    cat ${large} > terraform.tfvars
-                    terraform apply -input=false myplan
-                    """
+                    unstash 'Terraform_Input_File'
+                    sh 'cat Terraform_Input_File > terraform.tfvars'
+                    sh 'terraform apply -input=false myplan'
                 }
             }
         }
