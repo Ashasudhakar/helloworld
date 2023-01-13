@@ -28,11 +28,9 @@ pipeline {
                     secretKeyVariable: 'AWS_SECRET_ACCESS_KEY'
                 ]]) {
                     unstash 'large'
-                    sh """
-                    cat ${large} > terraform.tfvars
-                    terraform init
-                    terraform plan -out myplan
-                    """
+                    sh 'cat large > terraform.tfvars'
+                    sh 'terraform init'
+                    sh 'terraform plan -out myplan'
                 }
             }      
         }
