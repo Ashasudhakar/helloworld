@@ -6,10 +6,7 @@ pipeline {
             label 'LINUX-SLAVE'
         }
     }
-    options {
-        ansiColor('xterm')
-    }
-
+    
     stages {
 
         stage('TF Plan') {
