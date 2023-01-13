@@ -10,9 +10,16 @@ pipeline {
 
     stage('TF Plan') {
       steps {
-        container('terraform') {
-          sh 'terraform init'
-          sh 'terraform plan -out myplan'
+        withCredentials([[
+            $class: 'AmazonWebServicesCredentialsBinding',
+            credentialsId: "credentials-id-here",
+            accessKeyVariable: 'AWS_ACCESS_KEY_ID',
+            secretKeyVariable: 'AWS_SECRET_ACCESS_KEY'
+        ]]) {
+            container('terraform') {
+            sh 'terraform init'
+            sh 'terraform plan -out myplan'
+            }
         }
       }      
     }
@@ -27,12 +34,17 @@ pipeline {
 
     stage('TF Apply') {
       steps {
-        container('terraform') {
-          sh 'terraform apply -input=false myplan'
+        withCredentials([[
+            $class: 'AmazonWebServicesCredentialsBinding',
+            credentialsId: "credentials-id-here",
+            accessKeyVariable: 'AWS_ACCESS_KEY_ID',
+            secretKeyVariable: 'AWS_SECRET_ACCESS_KEY'
+        ]]) {
+            container('terraform') {
+            sh 'terraform apply -input=false myplan'
+            }
         }
       }
     }
-
-  } 
-
+  }
 }
