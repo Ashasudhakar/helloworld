@@ -6,6 +6,10 @@ pipeline {
             args  '--entrypoint="" -u root'
         }
     }
+
+    parameters {
+        base64File 'THEFILE'
+    }
     
     stages {
 
