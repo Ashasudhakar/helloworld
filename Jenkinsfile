@@ -12,13 +12,6 @@ pipeline {
     }
 
     stages {
-        stage('Example') {
-            steps {
-                unstash 'large'
-                sh 'cat large'
-            }
-        }
-
         stage('TF Plan') {
             steps {
                 withCredentials([[
