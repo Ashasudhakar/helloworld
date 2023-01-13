@@ -1,15 +1,49 @@
-resource "aws_s3_bucket_lifecycle_configuration" "example" {
-  count  = var.enable_lifecycle ? 1 : 0
-  bucket = aws_s3_bucket.b.id
+resource "aws_s3_bucket_lifecycle_configuration" "bucket-config" {
+  count = var.enable_lifecycle ? 1 : 0
+
+  bucket = aws_s3_bucket.b.bucket
 
   rule {
-    id = "rule-1"
+    id = "log"
 
-    filter {
-      prefix = "logs/"
+    expiration {
+      days = 90
     }
 
-    # ... other transition/expiration actions ...
+    filter {
+      and {
+        prefix = "log/"
+
+        tags = {
+          rule      = "log"
+          autoclean = "true"
+        }
+      }
+    }
+
+    status = "Enabled"
+
+    transition {
+      days          = 30
+      storage_class = "STANDARD_IA"
+    }
+
+    transition {
+      days          = 60
+      storage_class = "GLACIER"
+    }
+  }
+
+  rule {
+    id = "tmp"
+
+    filter {
+      prefix = "tmp/"
+    }
+
+    expiration {
+      date = "2023-01-13T00:00:00Z"
+    }
 
     status = "Enabled"
   }
