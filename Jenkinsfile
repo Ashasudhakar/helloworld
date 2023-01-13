@@ -6,6 +6,10 @@ pipeline {
             args  '--entrypoint="" -u root'
         }
     }
+    
+    options {
+        ansiColor('xterm')
+    }
 
     parameters {
         stashedFile 'large'
