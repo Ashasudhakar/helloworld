@@ -7,17 +7,18 @@ pipeline {
         }
     }
 
+    parameters {
+        base64File 'small'
+    }
+
     stages {
-        stage('TF Input') {
+        stage('Example') {
             steps {
-                script {
-                 
-                    def inputCSVPath = input message: 'Upload file', parameters: [file(name: 'Test.csv', description: 'Upload only CSV file')]
-                    def csvContent = readFile "${inputCSVPath}"
-                    
-                    echo ("CSV FILE PATH IS : ${inputCSVPath}")
-                    echo("CSV CONTENT IS: ${csvContent}") 
+                withFileParameter('small') {
+                sh 'cat $small'
                 }
+                // unstash 'large'
+                // sh 'cat large'
             }
         }
 
