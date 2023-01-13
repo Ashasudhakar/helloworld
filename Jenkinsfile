@@ -9,7 +9,9 @@ pipeline {
 
     stages {
         stage('TF Input') {
-            def terraformInputsFilePath = input message: 'Upload your terraform inputs file', parameters: [file(description: 'terraform inputs', name: 'uploadedFile')]
+            steps {
+                def terraformInputsFilePath = input message: 'Upload your terraform inputs file', parameters: [file(description: 'terraform inputs', name: 'uploadedFile')]
+            }
         }
 
         stage('TF Plan') {
