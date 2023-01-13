@@ -7,11 +7,10 @@ pipeline {
         }
     }
 
-    parameters {
-        base64File 'THEFILE'
-    }
-    
     stages {
+        stage('TF Input') {
+            def terraformInputsFilePath = input message: 'Upload your terraform inputs file', parameters: [file(description: 'terraform inputs', name: 'uploadedFile')]
+        }
 
         stage('TF Plan') {
             steps {
@@ -21,6 +20,7 @@ pipeline {
                     accessKeyVariable: 'AWS_ACCESS_KEY_ID',
                     secretKeyVariable: 'AWS_SECRET_ACCESS_KEY'
                 ]]) {
+                    sh "cat ${terraformInputsFilePath}"
                     sh 'terraform init'
                     sh 'terraform plan -out myplan'
                 }
