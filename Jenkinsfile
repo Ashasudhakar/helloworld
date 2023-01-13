@@ -8,17 +8,14 @@ pipeline {
     }
 
     parameters {
-        base64File 'small'
+        stashedFile 'large'
     }
 
     stages {
         stage('Example') {
             steps {
-                withFileParameter('small') {
-                sh 'cat $small'
-                }
-                // unstash 'large'
-                // sh 'cat large'
+                unstash 'large'
+                sh 'cat large'
             }
         }
 
@@ -30,9 +27,12 @@ pipeline {
                     accessKeyVariable: 'AWS_ACCESS_KEY_ID',
                     secretKeyVariable: 'AWS_SECRET_ACCESS_KEY'
                 ]]) {
-                    sh "cat ${terraformInputsFilePath}"
-                    sh 'terraform init'
-                    sh 'terraform plan -out myplan'
+                    unstash 'large'
+                    sh """
+                    cat ${large} > terraform.tfvars
+                    terraform init
+                    terraform plan -out myplan
+                    """
                 }
             }      
         }
@@ -53,7 +53,11 @@ pipeline {
                     accessKeyVariable: 'AWS_ACCESS_KEY_ID',
                     secretKeyVariable: 'AWS_SECRET_ACCESS_KEY'
                 ]]) {
-                    sh 'terraform apply -input=false myplan'
+                    unstash 'large'
+                    sh """
+                    cat ${large} > terraform.tfvars
+                    terraform apply -input=false myplan
+                    """
                 }
             }
         }
