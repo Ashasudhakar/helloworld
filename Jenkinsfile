@@ -2,17 +2,13 @@ pipeline {
 
   agent any
 
-  environment {
-    SVC_ACCOUNT_KEY = credentials('terraform-auth')
-  }
-
   stages {
 
     stage('TF Plan') {
       steps {
         withCredentials([[
             $class: 'AmazonWebServicesCredentialsBinding',
-            credentialsId: "credentials-id-here",
+            credentialsId: "terraform-auth",
             accessKeyVariable: 'AWS_ACCESS_KEY_ID',
             secretKeyVariable: 'AWS_SECRET_ACCESS_KEY'
         ]]) {
@@ -36,7 +32,7 @@ pipeline {
       steps {
         withCredentials([[
             $class: 'AmazonWebServicesCredentialsBinding',
-            credentialsId: "credentials-id-here",
+            credentialsId: "terraform-auth",
             accessKeyVariable: 'AWS_ACCESS_KEY_ID',
             secretKeyVariable: 'AWS_SECRET_ACCESS_KEY'
         ]]) {
