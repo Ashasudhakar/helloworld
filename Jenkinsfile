@@ -10,7 +10,14 @@ pipeline {
     stages {
         stage('TF Input') {
             steps {
-                def terraformInputsFilePath = input message: 'Upload your terraform inputs file', parameters: [file(description: 'terraform inputs', name: 'uploadedFile')]
+                script {
+                 
+                    def inputCSVPath = input message: 'Upload file', parameters: [file(name: 'Test.csv', description: 'Upload only CSV file')]
+                    def csvContent = readFile "${inputCSVPath}"
+                    
+                    echo ("CSV FILE PATH IS : ${inputCSVPath}")
+                    echo("CSV CONTENT IS: ${csvContent}") 
+                }
             }
         }
 
