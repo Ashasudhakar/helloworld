@@ -57,7 +57,7 @@ pipeline {
                                         folder_prefix = 'prod'
                                     }
                                     sh """
-                                    export TF_VAR_state_file="${folder_prefix}\/${env}.tfstate"
+                                    export TF_VAR_state_file="${folder_prefix}/${env}.tfstate"
                                     export TF_VAR_var_file_path=".terraform/modules/${module}/${module}/${folder_prefix}/${env}.tfvars"
                                     export TF_VAR_plan_file_name="${env}_tfplan"
                                     
