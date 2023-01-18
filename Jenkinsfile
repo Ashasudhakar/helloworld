@@ -36,12 +36,15 @@ pipeline {
                     modules = params.LIST_MODULES.split(",")
                     envs    = params.ENVIRONMENTS.split(",")
 
-                    modules.each { module ->
-                        stage("Updating module source in terraform main file") {
-                            sh "sed -i 's/var_module_name/${module}/' main.tf"
-                            sh "sed -i 's/var_git_branch/${params.MODULES_GIT_BRANCH}/' main.tf"
+                    
+                    stage("Updating terraform.tfvars with all selected modules enabled true for deployment") {
+                        // sh "sed -i 's/var_git_branch/${params.MODULES_GIT_BRANCH}/' main.tf"
+                        modules.each { module ->
+                            sh "sed -i \"s/enable_${module}_param/true/' terraform.tfvars"
                         }
+                    }
 
+                    modules.each { module ->
                         envs.each { env ->
                             print "###### Start executing terraform deployment for the module ${module} for env ${env} ######"
 
@@ -62,7 +65,7 @@ pipeline {
 
                                     sh """
                                     terraform init -backend-config "key=${folder_prefix}/${env}.tfstate"
-                                    terraform plan --var-file .terraform/modules/common/${module}/${folder_prefix}/${env}.tfvars -out ${env}_tfplan
+                                    terraform plan --var-file .terraform/modules/${module}/${module}/${folder_prefix}/${env}.tfvars -out ${env}_tfplan
                                     """
                                 }
                             }
@@ -75,7 +78,7 @@ pipeline {
                                     secretKeyVariable: 'AWS_SECRET_ACCESS_KEY'
                                 ]]) {
                                     sh "terraform apply -input=false ${env}_tfplan"
-                                    // sh "terraform destroy --auto-approve --var-file .terraform/modules/common/${module}/${folder_prefix}/${env}.tfvars"
+                                    // sh "terraform destroy --auto-approve --var-file .terraform/modules/${module}/${module}/${folder_prefix}/${env}.tfvars"
                                 }
                             }
                             print "###### End executing terraform deployment for the module ${module} for env ${env} ######"
