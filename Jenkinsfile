@@ -11,7 +11,7 @@ pipeline {
         ansiColor('xterm')
     }
 
-    parameters {[
+    parameters {
         string(
             defaultValue: 's3,ec2',
             name: 'LIST_MODULES',
