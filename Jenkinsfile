@@ -37,12 +37,13 @@ pipeline {
                     envs    = params.ENVIRONMENTS.split(",")
 
                     modules.each { module ->
+                        stage("Updating module source in terraform main file") {
+                            sh "sed -i 's/var_module_name/${module}/' main.tf"
+                            sh "sed -i 's/var_git_branch/${params.MODULES_GIT_BRANCH}/' main.tf"
+                        }
+
                         envs.each { env ->
                             print "###### Start executing terraform deployment for the module ${module} for env ${env} ######"
-                            stage("Updating module source in terraform main file") {
-                                sh "sed -i 's/var_module_name/${module}/' main.tf"
-                                sh "sed -i 's/var_git_branch/${params.MODULES_GIT_BRANCH}/' main.tf"
-                            }
 
                             stage("${module}-${env}-stage-TF-PLAN") {
                                 withCredentials([[
@@ -53,15 +54,14 @@ pipeline {
                                 ]]) {
                                     if (env.startsWith('dev')) {
                                         folder_prefix = 'dev'
-                                    }
-                                    if (env.startsWith('qa')) {
+                                    } else if (env.startsWith('qa')) {
                                         folder_prefix = 'qa'
-                                    }
-                                    if (env.startsWith('prod')) {
+                                    } else if (env.startsWith('prod')) {
                                         folder_prefix = 'prod'
                                     }
+
                                     sh """
-                                    terraform init -backend-config "key=${folder_prefix}/${env}.tfstate"
+                                    terraform init -backend-config "key=${folder_prefix}/${env}.tfstate --reconfigure"
                                     terraform plan --var-file .terraform/modules/common/${module}/${folder_prefix}/${env}.tfvars -out ${env}_tfplan
                                     """
                                 }
@@ -75,7 +75,7 @@ pipeline {
                                     secretKeyVariable: 'AWS_SECRET_ACCESS_KEY'
                                 ]]) {
                                     sh "terraform apply -input=false ${env}_tfplan"
-                                    // sh "terraform destroy --auto-approve --var-file .terraform/modules/${module}/${module}/${folder_prefix}/${env}.tfvars"
+                                    // sh "terraform destroy --auto-approve --var-file .terraform/modules/common/${module}/${folder_prefix}/${env}.tfvars"
                                 }
                             }
                             print "###### End executing terraform deployment for the module ${module} for env ${env} ######"
