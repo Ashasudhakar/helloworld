@@ -68,7 +68,7 @@ pipeline {
                                 secretKeyVariable: 'AWS_SECRET_ACCESS_KEY'
                             ]]) {
                                 sh """
-                                terraform init -backend-config "key=${folder_prefix}/${env}.tfstate"
+                                terraform init -reconfigure -backend-config "key=${folder_prefix}/${env}.tfstate"
                                 terraform plan ${vars_file_list_proposed} -out ${env}_tfplan
                                 """
                             }
@@ -87,6 +87,7 @@ pipeline {
                         }
                         print "###### End executing terraform deployment for env ${env} with modules ${modules} ######"
 
+                        // resetting the list for next env execution in the loop
                         vars_file_list = []
                     }
                 }
