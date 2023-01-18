@@ -61,7 +61,7 @@ pipeline {
                                     export TF_VAR_var_file_path=".terraform/modules/${module}/${module}/${folder_prefix}/${env}.tfvars"
                                     export TF_VAR_plan_file_name="${env}_tfplan"
                                     
-                                    terraform init -backend-config "key=$TF_VAR_state_file"
+                                    terraform init -migrate-state -backend-config "key=$TF_VAR_state_file"
                                     terraform plan --var-file $TF_VAR_var_file_path -out $TF_VAR_plan_file_name"
                                     """
                                 }
