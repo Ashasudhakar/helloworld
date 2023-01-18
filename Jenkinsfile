@@ -38,7 +38,7 @@ pipeline {
 
                     modules.each { module ->
                         envs.each { env ->
-                            print "###### Start executing terraform deployment for the module ${module} for env ${env}"
+                            print "###### Start executing terraform deployment for the module ${module} for env ${env} ######"
                             stage("${module}-${env}-stage-TF-PLAN") {
                                 withCredentials([[
                                     $class: 'AmazonWebServicesCredentialsBinding',
@@ -56,9 +56,14 @@ pipeline {
                                     if (env.startsWith('prod')) {
                                         folder_prefix = 'prod'
                                     }
-                                    sh 'terraform init'
-                                    // sh "terraform plan -var \"module_name=${module}\" -var \"git_branch=${params.MODULES_GIT_BRANCH}\" --var-file .terraform/modules/${module}/${module}/${folder_prefix}/${env}.tfvars -out myplan"
-                                    sh "terraform plan --var-file .terraform/modules/${module}/${module}/${folder_prefix}/${env}.tfvars -out myplan"
+                                    sh """
+                                    export TF_VAR_state_file="${folder_prefix}\/${env}.tfstate"
+                                    export TF_VAR_var_file_path=".terraform/modules/${module}/${module}/${folder_prefix}/${env}.tfvars"
+                                    export TF_VAR_plan_file_name="${env}_tfplan"
+                                    
+                                    terraform init -backend-config "key=$TF_VAR_state_file"
+                                    terraform plan --var-file $TF_VAR_var_file_path -out $TF_VAR_plan_file_name"
+                                    """
                                 }
                             }
 
@@ -69,10 +74,10 @@ pipeline {
                                     accessKeyVariable: 'AWS_ACCESS_KEY_ID',
                                     secretKeyVariable: 'AWS_SECRET_ACCESS_KEY'
                                 ]]) {
-                                    sh 'terraform apply -input=false myplan'
+                                    sh "terraform apply -input=false $TF_VAR_plan_file_name"
                                 }
                             }
-                            print "###### End executing terraform deployment for the module ${module} for env ${env}"
+                            print "###### End executing terraform deployment for the module ${module} for env ${env} ######"
                         }
                     }
                 }
