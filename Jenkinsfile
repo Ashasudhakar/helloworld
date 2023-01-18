@@ -56,12 +56,8 @@ pipeline {
                                         folder_prefix = 'prod'
                                     }
                                     sh """
-                                    export TF_VAR_state_file="${folder_prefix}/${env}.tfstate"
-                                    export TF_VAR_var_file_path=".terraform/modules/${module}/${module}/${folder_prefix}/${env}.tfvars"
-                                    export TF_VAR_plan_file_name="${env}_tfplan"
-                                    
-                                    terraform init -backend-config "key=$TF_VAR_state_file" -migrate-state
-                                    terraform plan --var-file $TF_VAR_var_file_path -out $TF_VAR_plan_file_name"
+                                    terraform init -backend-config "key=${folder_prefix}/${env}.tfstate" -migrate-state
+                                    terraform plan --var-file .terraform/modules/${module}/${module}/${folder_prefix}/${env}.tfvars -out ${env}_tfplan"
                                     """
                                 }
                             }
@@ -73,7 +69,7 @@ pipeline {
                                     accessKeyVariable: 'AWS_ACCESS_KEY_ID',
                                     secretKeyVariable: 'AWS_SECRET_ACCESS_KEY'
                                 ]]) {
-                                    sh "terraform apply -input=false $TF_VAR_plan_file_name"
+                                    sh "terraform apply -input=false ${env}_tfplan"
                                 }
                             }
                             print "###### End executing terraform deployment for the module ${module} for env ${env} ######"
