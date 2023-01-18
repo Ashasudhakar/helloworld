@@ -40,7 +40,7 @@ pipeline {
                     stage("Updating terraform.tfvars with all selected modules enabled true for deployment") {
                         // sh "sed -i 's/var_git_branch/${params.MODULES_GIT_BRANCH}/' main.tf"
                         modules.each { module ->
-                            sh "sed -i \"s/enable_${module}_param/true/' terraform.tfvars"
+                            sh "sed -i \"s/enable_${module}_param/true/\" terraform.tfvars"
                         }
                     }
 
