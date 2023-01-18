@@ -57,7 +57,7 @@ pipeline {
                                         folder_prefix = 'prod'
                                     }
                                     sh 'terraform init'
-                                    sh "terraform plan -var \"module_name=${module}\" -var \"git_branch=${params.MODULES_GIT_BRANCH}\" --var-file ${folder_prefix}/${env}.tfvars -out myplan"
+                                    sh "terraform plan -var \"module_name=${module}\" -var \"git_branch=${params.MODULES_GIT_BRANCH}\" --var-file .terraform/modules/${module}/${module}/${folder_prefix}/${env}.tfvars -out myplan"
                                 }
                             }
 

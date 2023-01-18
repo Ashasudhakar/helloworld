@@ -1,4 +1,4 @@
-module "common" {
+module "s3" {
   # source = "git::https://github.com/Ashasudhakar/terraform_modules.git//${var.module_name}?ref=${var.git_branch}"
   source = "git::https://github.com/Ashasudhakar/terraform_modules.git//s3?ref=main"
 
