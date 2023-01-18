@@ -39,7 +39,7 @@ pipeline {
                     def vars_file_list= []
 
                     envs.each { env ->
-                        print "###### Start executing terraform deployment for env ${env} with module for the module ${module} ######"
+                        print "###### Start executing terraform deployment for env ${env} with modules ${modules} ######"
                         
                         stage("Enabling selected modules for deployment") {
                             if (env.startsWith('dev')) {
@@ -82,7 +82,7 @@ pipeline {
                                 // sh "terraform destroy --auto-approve --var-file .terraform/modules/${module}/${module}/${folder_prefix}/${env}.tfvars"
                             }
                         }
-                        print "###### End executing terraform deployment for the module ${module} for env ${env} ######"
+                        print "###### End executing terraform deployment for env ${env} with modules ${modules} ######"
                     }
                 }
             }
