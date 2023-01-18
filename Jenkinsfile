@@ -36,7 +36,7 @@ pipeline {
                     modules = params.LIST_MODULES.split(",")
                     envs    = params.ENVIRONMENTS.split(",")
                     
-                    def vars_file_list= []
+                    def vars_file_list = []
 
                     envs.each { env ->
                         print "###### Start executing terraform deployment for env ${env} with modules ${modules} ######"
@@ -86,6 +86,8 @@ pipeline {
                             }
                         }
                         print "###### End executing terraform deployment for env ${env} with modules ${modules} ######"
+
+                        vars_file_list = []
                     }
                 }
             }
