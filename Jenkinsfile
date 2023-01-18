@@ -56,7 +56,7 @@ pipeline {
                             }
                         }
 
-                        def vars_file_list_proposed = vars_file_list.replaceAll("[", "").replaceAll("]", "").replaceAll(",", "")
+                        def vars_file_list_proposed = "${vars_file_list}".replaceAll("[", "").replaceAll("]", "").replaceAll(",", "")
 
                         print "${vars_file_list_proposed}"
 
