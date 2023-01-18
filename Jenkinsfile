@@ -39,6 +39,11 @@ pipeline {
                     modules.each { module ->
                         envs.each { env ->
                             print "###### Start executing terraform deployment for the module ${module} for env ${env} ######"
+                            stage("Updating module source in terraform main file") {
+                                sh "sed -i 's/var_module_name/${module}/' main.tf"
+                                sh "sed -i 's/var_git_branch/${params.MODULES_GIT_BRANCH}/' main.tf"
+                            }
+
                             stage("${module}-${env}-stage-TF-PLAN") {
                                 withCredentials([[
                                     $class: 'AmazonWebServicesCredentialsBinding',
@@ -56,7 +61,7 @@ pipeline {
                                         folder_prefix = 'prod'
                                     }
                                     sh """
-                                    terraform init -backend-config "key=${folder_prefix}/${env}.tfstate" -migrate-state -force-copy
+                                    terraform init -backend-config "key=${folder_prefix}/${env}.tfstate"
                                     terraform plan --var-file .terraform/modules/${module}/${module}/${folder_prefix}/${env}.tfvars -out ${env}_tfplan
                                     """
                                 }
@@ -69,8 +74,8 @@ pipeline {
                                     accessKeyVariable: 'AWS_ACCESS_KEY_ID',
                                     secretKeyVariable: 'AWS_SECRET_ACCESS_KEY'
                                 ]]) {
-                                    // sh "terraform apply -input=false ${env}_tfplan"
-                                    sh "terraform destroy --auto-approve --var-file .terraform/modules/${module}/${module}/${folder_prefix}/${env}.tfvars"
+                                    sh "terraform apply -input=false ${env}_tfplan"
+                                    // sh "terraform destroy --auto-approve --var-file .terraform/modules/${module}/${module}/${folder_prefix}/${env}.tfvars"
                                 }
                             }
                             print "###### End executing terraform deployment for the module ${module} for env ${env} ######"

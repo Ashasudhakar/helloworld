@@ -1,6 +1,6 @@
-module "s3" {
-  # source = "git::https://github.com/Ashasudhakar/terraform_modules.git//${var.module_name}?ref=${var.git_branch}"
-  source = "git::https://github.com/Ashasudhakar/terraform_modules.git//s3?ref=main"
+module "common" {
+  source = "git::https://github.com/Ashasudhakar/terraform_modules.git//var_module_name?ref=var_git_branch"
+  # source = "git::https://github.com/Ashasudhakar/terraform_modules.git//s3?ref=main"
 
   ################################################
   #           s3 features flag                   #
