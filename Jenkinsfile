@@ -40,22 +40,25 @@ pipeline {
 
                     envs.each { env ->
                         print "###### Start executing terraform deployment for env ${env} with modules ${modules} ######"
-                        
+
+                        if (env.startsWith('dev')) {
+                            folder_prefix = 'dev'
+                        } else if (env.startsWith('qa')) {
+                            folder_prefix = 'qa'
+                        } else if (env.startsWith('prod')) {
+                            folder_prefix = 'prod'
+                        }
+
                         stage("Enabling selected modules for deployment") {
-                            if (env.startsWith('dev')) {
-                                folder_prefix = 'dev'
-                            } else if (env.startsWith('qa')) {
-                                folder_prefix = 'qa'
-                            } else if (env.startsWith('prod')) {
-                                folder_prefix = 'prod'
-                            }
                             modules.each { module ->
                                 vars_file_list.add("-var-file .terraform/modules/${module}/${module}/${folder_prefix}/${env}.tfvars")
                                 sh "sed -i \"s/enable_${module}_param/true/\" terraform.tfvars"
                             }
                         }
 
-                        print "${vars_file_list}"
+                        def vars_file_list_proposed = vars_file_list.replace("[", "").replace("]", "").replace(",", "")
+
+                        print "${vars_file_list_proposed}"
 
                         stage("${module}-${env}-stage-TF-PLAN") {
                             withCredentials([[
@@ -66,7 +69,7 @@ pipeline {
                             ]]) {
                                 sh """
                                 terraform init -backend-config "key=${folder_prefix}/${env}.tfstate"
-                                terraform plan --var-file .terraform/modules/${module}/${module}/${folder_prefix}/${env}.tfvars -out ${env}_tfplan
+                                terraform plan ${vars_file_list_proposed} -out ${env}_tfplan
                                 """
                             }
                         }
