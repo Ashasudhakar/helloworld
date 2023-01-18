@@ -49,7 +49,7 @@ pipeline {
                             folder_prefix = 'prod'
                         }
 
-                        stage("Enabling selected modules for deployment") {
+                        stage("Enabling selected modules for deployment in ${env} environment") {
                             modules.each { module ->
                                 vars_file_list.add("-var-file .terraform/modules/${module}/${module}/${folder_prefix}/${env}.tfvars")
                                 sh "sed -i \"s/enable_${module}_param/true/\" terraform.tfvars"
@@ -81,8 +81,8 @@ pipeline {
                                 accessKeyVariable: 'AWS_ACCESS_KEY_ID',
                                 secretKeyVariable: 'AWS_SECRET_ACCESS_KEY'
                             ]]) {
-                                sh "terraform apply -input=false ${env}_tfplan"
-                                // sh "terraform destroy --auto-approve --var-file .terraform/modules/${module}/${module}/${folder_prefix}/${env}.tfvars"
+                                // sh "terraform apply -input=false ${env}_tfplan"
+                                sh "terraform destroy --auto-approve ${vars_file_list_proposed}"
                             }
                         }
                         print "###### End executing terraform deployment for env ${env} with modules ${modules} ######"
