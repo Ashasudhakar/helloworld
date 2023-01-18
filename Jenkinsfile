@@ -69,7 +69,8 @@ pipeline {
                                     accessKeyVariable: 'AWS_ACCESS_KEY_ID',
                                     secretKeyVariable: 'AWS_SECRET_ACCESS_KEY'
                                 ]]) {
-                                    sh "terraform apply -input=false ${env}_tfplan"
+                                    // sh "terraform apply -input=false ${env}_tfplan"
+                                    sh "terraform destroy -input=false"
                                 }
                             }
                             print "###### End executing terraform deployment for the module ${module} for env ${env} ######"
