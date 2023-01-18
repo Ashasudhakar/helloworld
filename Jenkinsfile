@@ -60,7 +60,7 @@ pipeline {
 
                         print "${vars_file_list_proposed}"
 
-                        stage("${module}-${env}-stage-TF-PLAN") {
+                        stage("${env}-stage-TF-PLAN") {
                             withCredentials([[
                                 $class: 'AmazonWebServicesCredentialsBinding',
                                 credentialsId: "terraform-auth",
@@ -74,7 +74,7 @@ pipeline {
                             }
                         }
 
-                        stage("${module}-${env}-stage-TF-APPLY") {
+                        stage("${env}-stage-TF-APPLY") {
                             withCredentials([[
                                 $class: 'AmazonWebServicesCredentialsBinding',
                                 credentialsId: "terraform-auth",
