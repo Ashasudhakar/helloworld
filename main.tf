@@ -13,4 +13,15 @@ module "common" {
   #           s3 general config                  #
   ################################################
   bucket_name = var.bucket_name
+
+  ################################################
+  #           ec2 features flag                   #
+  ################################################
+  enable_eip = var.enable_eip
+
+  ################################################
+  #           ec2 general config                  #
+  ################################################
+  instance_name = var.instance_name
+  instance_type = var.instance_type
 }
