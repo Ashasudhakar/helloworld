@@ -56,7 +56,7 @@ pipeline {
                                         folder_prefix = 'prod'
                                     }
                                     sh """
-                                    terraform init -backend-config "key=${folder_prefix}/${env}.tfstate" -migrate-state --auto-approve
+                                    terraform init -backend-config "key=${folder_prefix}/${env}.tfstate" -migrate-state -force-copy
                                     terraform plan --var-file .terraform/modules/${module}/${module}/${folder_prefix}/${env}.tfvars -out ${env}_tfplan"
                                     """
                                 }
