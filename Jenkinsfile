@@ -61,7 +61,7 @@ pipeline {
                                     }
 
                                     sh """
-                                    terraform init -backend-config "key=${folder_prefix}/${env}.tfstate --reconfigure"
+                                    terraform init --reconfigure -backend-config "key=${folder_prefix}/${env}.tfstate"
                                     terraform plan --var-file .terraform/modules/common/${module}/${folder_prefix}/${env}.tfvars -out ${env}_tfplan
                                     """
                                 }
