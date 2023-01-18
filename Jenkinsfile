@@ -35,54 +35,54 @@ pipeline {
                 script {
                     modules = params.LIST_MODULES.split(",")
                     envs    = params.ENVIRONMENTS.split(",")
-
                     
-                    stage("Updating terraform.tfvars with all selected modules enabled true for deployment") {
-                        // sh "sed -i 's/var_git_branch/${params.MODULES_GIT_BRANCH}/' main.tf"
-                        modules.each { module ->
-                            sh "sed -i \"s/enable_${module}_param/true/\" terraform.tfvars"
-                        }
-                    }
+                    def vars_file_list= []
 
-                    modules.each { module ->
-                        envs.each { env ->
-                            print "###### Start executing terraform deployment for the module ${module} for env ${env} ######"
-
-                            stage("${module}-${env}-stage-TF-PLAN") {
-                                withCredentials([[
-                                    $class: 'AmazonWebServicesCredentialsBinding',
-                                    credentialsId: "terraform-auth",
-                                    accessKeyVariable: 'AWS_ACCESS_KEY_ID',
-                                    secretKeyVariable: 'AWS_SECRET_ACCESS_KEY'
-                                ]]) {
-                                    if (env.startsWith('dev')) {
-                                        folder_prefix = 'dev'
-                                    } else if (env.startsWith('qa')) {
-                                        folder_prefix = 'qa'
-                                    } else if (env.startsWith('prod')) {
-                                        folder_prefix = 'prod'
-                                    }
-
-                                    sh """
-                                    terraform init -backend-config "key=${folder_prefix}/${env}.tfstate"
-                                    terraform plan --var-file .terraform/modules/${module}/${module}/${folder_prefix}/${env}.tfvars -out ${env}_tfplan
-                                    """
-                                }
+                    envs.each { env ->
+                        print "###### Start executing terraform deployment for env ${env} with module for the module ${module} ######"
+                        
+                        stage("Enabling selected modules for deployment") {
+                            if (env.startsWith('dev')) {
+                                folder_prefix = 'dev'
+                            } else if (env.startsWith('qa')) {
+                                folder_prefix = 'qa'
+                            } else if (env.startsWith('prod')) {
+                                folder_prefix = 'prod'
                             }
-
-                            stage("${module}-${env}-stage-TF-APPLY") {
-                                withCredentials([[
-                                    $class: 'AmazonWebServicesCredentialsBinding',
-                                    credentialsId: "terraform-auth",
-                                    accessKeyVariable: 'AWS_ACCESS_KEY_ID',
-                                    secretKeyVariable: 'AWS_SECRET_ACCESS_KEY'
-                                ]]) {
-                                    sh "terraform apply -input=false ${env}_tfplan"
-                                    // sh "terraform destroy --auto-approve --var-file .terraform/modules/${module}/${module}/${folder_prefix}/${env}.tfvars"
-                                }
+                            modules.each { module ->
+                                vars_file_list.add("-var-file .terraform/modules/${module}/${module}/${folder_prefix}/${env}.tfvars")
+                                sh "sed -i \"s/enable_${module}_param/true/\" terraform.tfvars"
                             }
-                            print "###### End executing terraform deployment for the module ${module} for env ${env} ######"
                         }
+
+                        print "${vars_file_list}"
+
+                        stage("${module}-${env}-stage-TF-PLAN") {
+                            withCredentials([[
+                                $class: 'AmazonWebServicesCredentialsBinding',
+                                credentialsId: "terraform-auth",
+                                accessKeyVariable: 'AWS_ACCESS_KEY_ID',
+                                secretKeyVariable: 'AWS_SECRET_ACCESS_KEY'
+                            ]]) {
+                                sh """
+                                terraform init -backend-config "key=${folder_prefix}/${env}.tfstate"
+                                terraform plan --var-file .terraform/modules/${module}/${module}/${folder_prefix}/${env}.tfvars -out ${env}_tfplan
+                                """
+                            }
+                        }
+
+                        stage("${module}-${env}-stage-TF-APPLY") {
+                            withCredentials([[
+                                $class: 'AmazonWebServicesCredentialsBinding',
+                                credentialsId: "terraform-auth",
+                                accessKeyVariable: 'AWS_ACCESS_KEY_ID',
+                                secretKeyVariable: 'AWS_SECRET_ACCESS_KEY'
+                            ]]) {
+                                sh "terraform apply -input=false ${env}_tfplan"
+                                // sh "terraform destroy --auto-approve --var-file .terraform/modules/${module}/${module}/${folder_prefix}/${env}.tfvars"
+                            }
+                        }
+                        print "###### End executing terraform deployment for the module ${module} for env ${env} ######"
                     }
                 }
             }
