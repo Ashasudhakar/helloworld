@@ -16,18 +16,18 @@ pipeline {
             defaultValue: 's3,ec2',
             name: 'LIST_MODULES',
             trim: true
-        ),
+        )
         string(
             defaultValue: 'dev-1,qa-1',
             name: 'ENVIRONMENTS',
             trim: true
-        ),
+        )
         string(
             defaultValue: 'main',
             name: 'MODULES_GIT_BRANCH',
             trim: true
         )
-    ]}
+    }
 
     stages {
         stage('Getting Started with modules deployment') {
