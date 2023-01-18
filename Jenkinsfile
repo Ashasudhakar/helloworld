@@ -11,7 +11,7 @@ pipeline {
         ansiColor('xterm')
     }
 
-    parameters {
+    parameters {[
         string(
             defaultValue: 's3,ec2',
             name: 'LIST_MODULES',
@@ -27,7 +27,7 @@ pipeline {
             name: 'MODULES_GIT_BRANCH',
             trim: true
         )
-    }
+    ]}
 
     stages {
         stage('Getting Started with modules deployment') {
