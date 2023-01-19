@@ -18,7 +18,7 @@ pipeline {
             trim: true
         )
         string(
-            defaultValue: 'dev-1',
+            defaultValue: 'dev-1,qa-1',
             name: 'ENVIRONMENTS',
             trim: true
         )
