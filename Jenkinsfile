@@ -13,12 +13,12 @@ pipeline {
 
     parameters {
         string(
-            defaultValue: 's3',
+            defaultValue: 's3,ec2',
             name: 'LIST_MODULES',
             trim: true
         )
         string(
-            defaultValue: 'qa-1',
+            defaultValue: 'dev-1,qa-1',
             name: 'ENVIRONMENTS',
             trim: true
         )
